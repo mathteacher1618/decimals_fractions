@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>小數與分數互化 - 香港小學數學</title>
+  <!-- 引入 html2canvas 程式庫以支援報告圖片下載 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    /* 全局樣式與 iPad 觸控優化 */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f0f4f8;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      touch-action: manipulation;
+    }
+
+    /* 頂部導覽列 */
+    header {
+      background-color: #2b5278;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .lang-btn {
+      background-color: transparent;
+      border: 1px solid white;
+      color: white;
+      padding: 8px 18px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s;
+      min-height: 44px;
+    }
+
+    .lang-btn:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .page-title {
+      text-align: center;
+      font-size: 1.8rem;
+      color: #2b5278;
+      margin-bottom: 30px;
+      font-weight: bold;
+    }
+
+    /* 首頁選單網格 */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 2px solid transparent;
+      min-height: 120px;
+    }
+
+    .card:hover, .card:active {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      border-color: #4a90e2;
+    }
+
+    .card h3 {
+      font-size: 1.4rem;
+      color: #1a365d;
+      margin-bottom: 15px;
+    }
+
+    .card p {
+      color: #666;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    /* 練習界面 */
+    .quiz-wrapper {
+      max-width: 650px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .back-nav-btn {
+      background: white;
+      border: 1px solid #cbd5e0;
+      color: #4a5568;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      margin-bottom: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+      transition: all 0.2s;
+      min-height: 44px;
+    }
+
+    .back-nav-btn:hover {
+      background-color: #edf2f7;
+      color: #2b6cb0;
+    }
+
+    .quiz-card {
+      background: white;
+      border-radius: 16px;
+      padding: 35px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      width: 100%;
+    }
+
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      border-bottom: 2px solid #edf2f7;
+      padding-bottom: 12px;
+    }
+
+    .quiz-progress {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #3182ce;
+    }
+
+    .unit-tag {
+      background-color: #ebf8ff;
+      color: #2b6cb0;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.95rem;
+      font-weight: bold;
+    }
+
+    .equation {
+      font-size: 2rem;
+      font-weight: bold;
+      text-align: center;
+      margin: 25px 0;
+      color: #2d3748;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* 數學分數 UI 組件 */
+    .frac-display {
+      display: inline-flex;
+      flex-direction: column;
+      vertical-align: middle;
+      text-align: center;
+      font-size: 1.8rem;
+      padding: 0 4px;
+    }
+
+    .frac-display .num {
+      border-bottom: 2px solid #2d3748;
+      padding: 0 4px;
+      line-height: 1.1;
+    }
+
+    .frac-display .den {
+      padding: 0 4px;
+      line-height: 1.1;
+    }
+
+    .mixed-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .mixed-input-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .frac-input-group {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .answer-input {
+      font-size: 1.6rem;
+      text-align: center;
+      border: 2px solid #cbd5e0;
+      border-radius: 8px;
+      padding: 4px 8px;
+      outline: none;
+      transition: border-color 0.2s;
+      min-height: 48px;
+    }
+
+    .input-single {
+      width: 140px;
+      font-size: 1.8rem;
+    }
+
+    .input-int {
+      width: 65px;
+      height: 50px;
+      font-size: 1.6rem;
+    }
+
+    .input-num, .input-den {
+      width: 80px;
+      height: 42px;
+      font-size: 1.4rem;
+    }
+
+    .frac-line-hr {
+      width: 100%;
+      height: 2px;
+      background-color: #2d3748;
+      margin: 3px 0;
+    }
+
+    .answer-input:focus {
+      border-color: #3182ce;
+    }
+
+    /* 選項按鈕組（適用於估計題型） */
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      margin-top: 15px;
+    }
+
+    .option-btn {
+      background: #f7fafc;
+      border: 2px solid #cbd5e0;
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #2d3748;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .option-btn:hover {
+      background: #ebf8ff;
+      border-color: #3182ce;
+      color: #2b6cb0;
+    }
+
+    .option-btn.selected {
+      background: #3182ce;
+      border-color: #2b6cb0;
+      color: white;
+    }
+
+    .btn {
+      display: inline-block;
+      width: 100%;
+      padding: 14px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      text-align: center;
+      min-height: 48px;
+    }
+
+    .btn:active {
+      transform: scale(0.99);
+    }
+
+    .btn-primary { background-color: #3182ce; color: white; }
+    .btn-primary:hover { background-color: #2b6cb0; }
+
+    .btn-success { background-color: #38a169; color: white; }
+    .btn-success:hover { background-color: #2f855a; }
+
+    .btn-purple { background-color: #8e44ad; color: white; margin-bottom: 10px; }
+    .btn-purple:hover { background-color: #7d3c98; }
+
+    .btn-sky { background-color: #38bdf8; color: white; margin-bottom: 10px; }
+    .btn-sky:hover { background-color: #0284c7; }
+
+    .btn-gray { background-color: #7f8c8d; color: white; }
+    .btn-gray:hover { background-color: #636e72; }
+
+    /* 反饋與提示訊息 */
+    .feedback-box {
+      margin-top: 20px;
+      padding: 18px;
+      border-radius: 10px;
+      text-align: left;
+      font-size: 1rem;
+    }
+
+    .feedback-success {
+      background-color: #c6f6d5;
+      color: #22543d;
+      border: 1px solid #9ae6b4;
+      text-align: center;
+    }
+
+    .feedback-warning {
+      background-color: #feebc8;
+      color: #744210;
+      border: 1px solid #fbd38d;
+    }
+
+    .feedback-danger {
+      background-color: #fff5f5;
+      color: #742a2a;
+      border: 1px solid #feb2b2;
+    }
+
+    /* 解題步驟卡片 */
+    .solution-steps {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      width: 100%;
+    }
+
+    /* 分析報告界面 */
+    .report-card {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      max-width: 600px;
+      margin: 0 auto;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    .report-title {
+      text-align: center;
+      color: #3182ce;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    .report-section {
+      background-color: #f8fafc;
+      border-radius: 8px;
+      padding: 12px 20px;
+      margin-bottom: 15px;
+    }
+
+    .report-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      color: #4a5568;
+      font-size: 0.95rem;
+    }
+
+    .report-row.dashed {
+      border-bottom: 1px dashed #cbd5e0;
+    }
+
+    .report-val { font-weight: bold; }
+    .val-green { color: #276749; }
+    .val-red { color: #9b2c2c; }
+    .val-blue { color: #0284c7; }
+
+    .section-label {
+      font-weight: bold;
+      color: #2d3748;
+      margin: 15px 0 10px 0;
+      font-size: 1rem;
+    }
+
+    .list-box {
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .list-box.correct-bg { background-color: #f7fafc; }
+    .list-box.wrong-bg { background-color: #f7fafc; }
+
+    .list-title {
+      font-weight: bold;
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .item-card-correct {
+      background: #f0fff4;
+      border: 1px solid #c6f6d5;
+      border-radius: 8px;
+      padding: 10px 16px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+      color: #22543d;
+      font-weight: 500;
+    }
+
+    .item-card-wrong {
+      background: #fff5f5;
+      border: 1px solid #fed7d7;
+      border-radius: 8px;
+      padding: 10px 16px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+      color: #9b2c2c;
+      font-weight: 500;
+    }
+
+    .item-card-correct:last-child, .item-card-wrong:last-child {
+      margin-bottom: 0;
+    }
+
+    .item-q-title { font-weight: bold; }
+    .item-ans-text { font-weight: bold; }
+
+    /* Modal 彈窗 */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .modal-box h3 { margin-bottom: 12px; color: #2b5278; }
+    .modal-box p { margin-bottom: 20px; color: #4a5568; }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .hidden { display: none !important; }
+
+    /* iPad / 行動裝置優化 */
+    @media (max-width: 768px) {
+      .quiz-card { padding: 25px 18px; }
+      .equation { font-size: 1.6rem; gap: 8px; }
+      .input-single { width: 120px; font-size: 1.5rem; }
+      .input-int { width: 55px; font-size: 1.4rem; }
+      .input-num, .input-den { width: 70px; font-size: 1.3rem; }
+      .frac-display { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 頂部導覽列 -->
+  <header>
+    <h1 id="header-title">小數與分數互化</h1>
+    <button id="lang-toggle-btn" class="lang-btn" onclick="toggleLanguage()">English</button>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <!-- 1. 首頁選擇界面 -->
+      <div id="page-home">
+        <h2 id="home-subtitle" class="page-title">請選擇學習單元</h2>
+        <div class="menu-grid">
+          <div class="card" onclick="startQuiz('dec_to_frac')">
+            <h3 id="unit1-title">單元一：小數化為分數</h3>
+            <p id="desc-opt1">學習將小數轉換為真分數或帶分數，熟練最簡分數與約簡技巧。</p>
+          </div>
+          <div class="card" onclick="startQuiz('frac_to_dec')">
+            <h3 id="unit2-title">單元二：分數化為小數</h3>
+            <p id="desc-opt2">掌握擴分法化分數為小數，並透過估計培養對數值大小的靈感與數感。</p>
+          </div>
+          <div class="card" onclick="startQuiz('common_combos')">
+            <h3 id="unit3-title">單元三：常見互化組合</h3>
+            <p id="desc-opt3">熟記日常極為常用的小數與分數對應，提升心算與轉換反應！</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 答題界面 -->
+      <div id="page-quiz" class="hidden">
+        <div class="quiz-wrapper">
+          <button class="back-nav-btn" onclick="askReturnHome()">
+            <span id="lbl-back-btn">← 返回單元選擇</span>
+          </button>
+
+          <div class="quiz-card">
+            <div class="quiz-header">
+              <span id="quiz-mode-name" class="unit-tag">單元一：小數化為分數</span>
+              <span id="quiz-progress-text" class="quiz-progress">題目 1 / 10</span>
+            </div>
+
+            <div class="equation" id="equation-box">
+              <span id="question-display">--</span>
+              <span id="equal-sign">=</span>
+              <div id="answer-input-container">
+                <!-- 動態注入輸入框或選項 -->
+              </div>
+            </div>
+
+            <div id="action-area">
+              <button id="btn-submit" class="btn btn-primary" onclick="checkAnswer()">提交答案</button>
+              <button id="btn-next" class="btn btn-success hidden" onclick="nextQuestion()">下一題 ➔</button>
+            </div>
+
+            <div id="feedback-area" class="hidden"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. 表現分析報告 -->
+      <div id="page-report" class="hidden">
+        <div id="report-card-to-capture" class="report-card">
+          <h2 id="report-main-title" class="report-title">練習完成！表現分析報告</h2>
+
+          <div class="report-section">
+            <div class="report-row dashed">
+              <span id="lbl-start-time">開始時間：</span>
+              <span id="val-start-time" class="report-val">--</span>
+            </div>
+            <div class="report-row dashed">
+              <span id="lbl-end-time">完成時間：</span>
+              <span id="val-end-time" class="report-val">--</span>
+            </div>
+            <div class="report-row">
+              <span id="lbl-duration">總用時：</span>
+              <span id="val-duration" class="report-val val-blue">--</span>
+            </div>
+          </div>
+
+          <div class="report-section">
+            <div class="report-row dashed">
+              <span id="lbl-total-correct">總答對題數：</span>
+              <span id="val-correct-count" class="report-val val-green">0 / 10</span>
+            </div>
+            <div class="report-row">
+              <span id="lbl-accuracy">整體正確率：</span>
+              <span id="val-accuracy" class="report-val">0%</span>
+            </div>
+          </div>
+
+          <div class="section-label" id="lbl-mastery-title">各主題掌握度分析</div>
+          <div class="report-section">
+            <div class="report-row">
+              <span id="report-unit-name">1. 單元一：小數化為分數</span>
+              <span id="val-unit-mastery" class="report-val">0 / 10 (0%)</span>
+            </div>
+          </div>
+
+          <div class="list-box correct-bg">
+            <div class="list-title val-green">
+              <span>☑</span> <span id="lbl-correct-title">答對的題目</span>
+            </div>
+            <div id="correct-list-container"></div>
+          </div>
+
+          <div class="list-box wrong-bg">
+            <div class="list-title val-red">
+              <span>✕</span> <span id="lbl-wrong-title">答錯 / 需要協助的題目</span>
+            </div>
+            <div id="wrong-list-container"></div>
+          </div>
+
+          <div data-html2canvas-ignore="true" style="margin-top: 20px;">
+            <button class="btn btn-purple" onclick="downloadReportImage()"><span id="lbl-btn-download">💾 下載報告圖片</span></button>
+            <button class="btn btn-sky" onclick="retryPractice()"><span id="lbl-btn-retry">🔄 我想再試</span></button>
+            <button class="btn btn-gray" onclick="goHome()"><span id="lbl-btn-home">回到主頁重新選擇</span></button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- 通用 Modal -->
+  <div id="custom-modal" class="modal-overlay">
+    <div class="modal-box">
+      <h3 id="modal-title">標題</h3>
+      <p id="modal-msg">內容訊息</p>
+      <div class="modal-buttons">
+        <button id="modal-cancel-btn" class="btn btn-gray" style="flex: 1;" onclick="closeModal()">取消</button>
+        <button id="modal-confirm-btn" class="btn btn-primary" style="flex: 1;" onclick="confirmModalAction()">確定</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 完整雙語字典
+    const i18n = {
+      zh: {
+        headerTitle: "小數與分數互化",
+        langBtn: "English",
+        homeSubtitle: "請選擇學習單元",
+        unit1Title: "單元一：小數化為分數",
+        unit2Title: "單元二：分數化為小數",
+        unit3Title: "單元三：常見互化組合",
+        descOpt1: "學習將小數轉換為真分數或帶分數，熟練最簡分數與約簡技巧。",
+        descOpt2: "掌握擴分法化分數為小數，並透過估計培養對數值大小的靈感與數感。",
+        descOpt3: "熟記日常極為常用的小數與分數對應，提升心算與轉換反應！",
+        unit1: "單元一：小數化為分數",
+        unit2: "單元二：分數化為小數",
+        unit3: "單元三：常見互化組合",
+        qProgress: "題目",
+        questionLabel: "第 {n} 題",
+        ansLabel: "答案",
+        yourAnsLabel: "你的回答",
+        correctAnsLabel: "正確答案",
+        backBtn: "← 返回單元選擇",
+        submitBtn: "提交答案",
+        nextBtn: "下一題 ➔",
+        praise: ["太棒了！答對了！🌟", "非常優秀，計算得很精確！👏", "答對了！繼續保持！🎉", "真聰明！完全掌握了互化技巧！💪"],
+        encourageTitle: "💪 差一點點！別灰心，再試試看！",
+        conceptHintDec2Frac: "💡 解題思路：看小數點後有幾位，1位分母就是10，2位是100，3位是1000。小數數字直接當作分子！",
+        conceptHintFrac2Dec: "💡 解題思路：將分數擴分至分母是 10、100 或 1000 的分數，再化為小數喔！",
+        conceptHintEstimate: "💡 解題思路：先想想分數部分是【大於 0.5】還是【小於 0.5】喔！",
+        simplifyHint: "💡 解題思路：數值正確，但記得要把分數化為「最簡分數」（或正確的帶分數）喔！",
+        warnTrailingZero: "⚠️ 請勿在小數末尾輸入多餘的 0（例如：寫 0.8 而非 0.80）。",
+        estimateQuestionText: " 的數值在以下哪一組範圍之間？",
+        stepTitle: "完整解題思路：",
+        noWrong: "太厲害了！沒有答錯的題目！",
+        noCorrect: "無答對題目",
+        reportTitle: "練習完成！表現分析報告",
+        startTime: "開始時間：",
+        endTime: "完成時間：",
+        durationTime: "總用時：",
+        totalCorrect: "總答對題數：",
+        accuracy: "整體正確率：",
+        masteryTitle: "各主題掌握度分析",
+        correctTitle: "答對的題目",
+        wrongTitle: "答錯 / 需要協助的題目",
+        btnDownload: "💾 下載報告圖片",
+        btnRetry: "🔄 我想再試",
+        btnHome: "回到主頁重新選擇",
+        modalReturnTitle: "返回單元選擇",
+        modalReturnMsg: "確定要返回主選單嗎？目前的答題進度將不會被保存。",
+        modalCancel: "取消",
+        modalConfirm: "確定",
+        roundHintText: "(取至小數點後2位)"
+      },
+      en: {
+        headerTitle: "Decimals and Fractions",
+        langBtn: "繁體中文",
+        homeSubtitle: "Please Select a Learning Unit",
+        unit1Title: "Unit 1: Decimals to Fractions",
+        unit2Title: "Unit 2: Fractions to Decimals",
+        unit3Title: "Unit 3: Common Conversions",
+        descOpt1: "Convert decimals into proper or mixed fractions in simplest form.",
+        descOpt2: "Master converting fractions to decimals by expansion and cultivate sense by estimation.",
+        descOpt3: "Master common decimal-fraction pairs to build lightning-fast mental math!",
+        unit1: "Unit 1: Decimals to Fractions",
+        unit2: "Unit 2: Fractions to Decimals",
+        unit3: "Unit 3: Common Conversions",
+        qProgress: "Question",
+        questionLabel: "Q{n}",
+        ansLabel: "Ans",
+        yourAnsLabel: "Your Ans",
+        correctAnsLabel: "Correct Ans",
+        backBtn: "← Back to Unit Selection",
+        submitBtn: "Submit Answer",
+        nextBtn: "Next Question ➔",
+        praise: ["Great job! That's correct! 🌟", "Excellent work! Highly accurate! 👏", "Correct! Keep up the good work! 🎉", "Awesome! You mastered conversion! 💪"],
+        encourageTitle: "💪 Almost there! Keep trying!",
+        conceptHintDec2Frac: "💡 Hint: Check decimal places: 1 place -> denominator 10, 2 places -> 100, 3 places -> 1000. Put digits as numerator!",
+        conceptHintFrac2Dec: "💡 Hint: Expand the fraction to a denominator of 10, 100, or 1000 first, then convert to a decimal!",
+        conceptHintEstimate: "💡 Hint: Think whether the fraction part is greater than 0.5 or less than 0.5 first!",
+        simplifyHint: "💡 Hint: Value is correct, but please simplify your fraction to lowest terms!",
+        warnTrailingZero: "⚠️ Do not include unnecessary trailing zeros (e.g., write 0.8 instead of 0.80).",
+        estimateQuestionText: " is between which of the following ranges?",
+        stepTitle: "Complete Solution Steps:",
+        noWrong: "Amazing! No incorrect answers!",
+        noCorrect: "No correct questions",
+        reportTitle: "Practice Completed! Performance Report",
+        startTime: "Start Time:",
+        endTime: "Completion Time:",
+        durationTime: "Time Taken:",
+        totalCorrect: "Total Correct:",
+        accuracy: "Overall Accuracy:",
+        masteryTitle: "Topic Mastery Analysis",
+        correctTitle: "Correct Questions",
+        wrongTitle: "Incorrect / Needs Assistance",
+        btnDownload: "💾 Download Report Image",
+        btnRetry: "🔄 Try Again",
+        btnHome: "Back to Home",
+        modalReturnTitle: "Return to Unit Selection",
+        modalReturnMsg: "Are you sure you want to return to home? Current progress will be lost.",
+        modalCancel: "Cancel",
+        modalConfirm: "Confirm",
+        roundHintText: "(Round to 2 decimal places)"
+      }
+    };
+
+    let currentLang = 'zh';
+    let currentMode = '';
+    let questions = [];
+    let currentQIndex = 0;
+    let wrongAttempts = 0;
+    let records = [];
+    let startTimeObj = null;
+    let modalActionCallback = null;
+    let selectedOptionIndex = null;
+
+    // 工具函式：最大公因數 (GCD)
+    function gcd(a, b) {
+      a = Math.abs(a);
+      b = Math.abs(b);
+      while (b) {
+        let t = b;
+        b = a % b;
+        a = t;
+      }
+      return a;
+    }
+
+    // 鍵盤按下 Enter 處理
+    function handleKeyPress(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const submitBtn = document.getElementById('btn-submit');
+        const nextBtn = document.getElementById('btn-next');
+        if (!submitBtn.classList.contains('hidden')) {
+          checkAnswer();
+        } else if (!nextBtn.classList.contains('hidden')) {
+          nextQuestion();
+        }
+      }
+    }
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'zh' ? 'en' : 'zh';
+      const t = i18n[currentLang];
+      document.getElementById('header-title').innerText = t.headerTitle;
+      document.getElementById('lang-toggle-btn').innerText = t.langBtn;
+      document.getElementById('home-subtitle').innerText = t.homeSubtitle;
+      document.getElementById('unit1-title').innerText = t.unit1Title;
+      document.getElementById('unit2-title').innerText = t.unit2Title;
+      document.getElementById('unit3-title').innerText = t.unit3Title;
+      document.getElementById('desc-opt1').innerText = t.descOpt1;
+      document.getElementById('desc-opt2').innerText = t.descOpt2;
+      document.getElementById('desc-opt3').innerText = t.descOpt3;
+      document.getElementById('lbl-back-btn').innerText = t.backBtn;
+
+      if (!document.getElementById('page-quiz').classList.contains('hidden')) {
+        loadQuestion();
+      }
+    }
+
+    /* ----------------------------------------------------
+       題目生成邏輯
+    ---------------------------------------------------- */
+    function generateUnit1() {
+      let list = [];
+
+      // 初階 (3題)
+      const d1_options = [1, 3, 7, 9];
+      const n1 = d1_options[Math.floor(Math.random() * d1_options.length)];
+      list.push({
+        type: 'dec2frac',
+        decStr: `0.${n1}`,
+        targetInt: 0,
+        targetNum: n1,
+        targetDen: 10,
+        rawNum: n1,
+        rawDen: 10,
+        level: 'easy',
+        levelRank: 1,
+        hintZh: `0.${n1} 是一位小數，寫成分數是 ${n1}/10，且分子與分母互質，已是最簡分數。`,
+        hintEn: `0.${n1} has 1 decimal place = ${n1}/10, which is already in simplest form.`
+      });
+
+      const d2_options = [11, 13, 17, 19, 21, 23, 27, 29, 31, 33, 37, 39, 41, 43, 47, 49, 51, 53, 57, 59, 61, 63, 67, 69, 71, 73, 77, 79, 81, 83, 87, 89, 91, 93, 97, 99];
+      const n2 = d2_options[Math.floor(Math.random() * d2_options.length)];
+      list.push({
+        type: 'dec2frac',
+        decStr: `0.${n2}`,
+        targetInt: 0,
+        targetNum: n2,
+        targetDen: 100,
+        rawNum: n2,
+        rawDen: 100,
+        level: 'easy',
+        levelRank: 1,
+        hintZh: `0.${n2} 是兩位小數，寫成分數是 ${n2}/100，分子分母無法再約簡。`,
+        hintEn: `0.${n2} has 2 decimal places = ${n2}/100, which cannot be simplified further.`
+      });
+
+      let n3;
+      while (true) {
+        let candidate = Math.floor(Math.random() * 899) + 100;
+        let str = candidate.toString();
+        if (!str.includes('0') && gcd(candidate, 1000) === 1) {
+          n3 = candidate;
+          break;
+        }
+      }
+      list.push({
+        type: 'dec2frac',
+        decStr: `0.${n3}`,
+        targetInt: 0,
+        targetNum: n3,
+        targetDen: 1000,
+        rawNum: n3,
+        rawDen: 1000,
+        level: 'easy',
+        levelRank: 1,
+        hintZh: `0.${n3} 是三位小數，寫成分數是 ${n3}/1000，已是最簡分數。`,
+        hintEn: `0.${n3} has 3 decimal places = ${n3}/1000, which is in simplest form.`
+      });
+
+      // 中階 (4題)
+      for (let i = 0; i < 2; i++) {
+        let num;
+        while (true) {
+          let candidate = Math.floor(Math.random() * 89) + 11;
+          let str = candidate.toString();
+          let g = gcd(candidate, 100);
+          if (!str.includes('0') && g > 1) {
+            num = candidate;
+            break;
+          }
+        }
+        let g = gcd(num, 100);
+        list.push({
+          type: 'dec2frac',
+          decStr: `0.${num}`,
+          targetInt: 0,
+          targetNum: num / g,
+          targetDen: 100 / g,
+          rawNum: num,
+          rawDen: 100,
+          level: 'med',
+          levelRank: 2,
+          hintZh: `0.${num} = ${num}/100。分子與分母同除以 ${g} 約簡後，得到 ${num / g}/${100 / g}。`,
+          hintEn: `0.${num} = ${num}/100. Divide both by ${g} to get simplified fraction ${num / g}/${100 / g}.`
+        });
+      }
+
+      for (let i = 0; i < 2; i++) {
+        let num;
+        while (true) {
+          let candidate = Math.floor(Math.random() * 899) + 100;
+          let str = candidate.toString();
+          let g = gcd(candidate, 1000);
+          if (!str.includes('0') && g > 1) {
+            num = candidate;
+            break;
+          }
+        }
+        let g = gcd(num, 1000);
+        list.push({
+          type: 'dec2frac',
+          decStr: `0.${num}`,
+          targetInt: 0,
+          targetNum: num / g,
+          targetDen: 1000 / g,
+          rawNum: num,
+          rawDen: 1000,
+          level: 'med',
+          levelRank: 2,
+          hintZh: `0.${num} = ${num}/1000。分子與分母同除以 ${g} 約簡後，得到 ${num / g}/${1000 / g}。`,
+          hintEn: `0.${num} = ${num}/1000. Divide both by ${g} to get simplified fraction ${num / g}/${1000 / g}.`
+        });
+      }
+
+      // 高階 (3題)
+      const h1_nums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+      const h1_val = h1_nums[Math.floor(Math.random() * h1_nums.length)];
+      const g_h1 = gcd(h1_val, 100);
+      list.push({
+        type: 'dec2frac',
+        decStr: `0.0${h1_val}`,
+        targetInt: 0,
+        targetNum: h1_val / g_h1,
+        targetDen: 100 / g_h1,
+        rawNum: h1_val,
+        rawDen: 100,
+        level: 'hard',
+        levelRank: 3,
+        hintZh: `0.0${h1_val} = ${h1_val}/100。約簡後（同除以 ${g_h1}）為 ${h1_val / g_h1}/${100 / g_h1}。`,
+        hintEn: `0.0${h1_val} = ${h1_val}/100. Simplified (divide by ${g_h1}) is ${h1_val / g_h1}/${100 / g_h1}.`
+      });
+
+      const h2_nums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+      const h2_val = h2_nums[Math.floor(Math.random() * h2_nums.length)];
+      const g_h2 = gcd(h2_val, 1000);
+      list.push({
+        type: 'dec2frac',
+        decStr: `0.00${h2_val}`,
+        targetInt: 0,
+        targetNum: h2_val / g_h2,
+        targetDen: 1000 / g_h2,
+        rawNum: h2_val,
+        rawDen: 1000,
+        level: 'hard',
+        levelRank: 3,
+        hintZh: `0.00${h2_val} = ${h2_val}/1000。約簡後（同除以 ${g_h2}）為 ${h2_val / g_h2}/${1000 / g_h2}。`,
+        hintEn: `0.00${h2_val} = ${h2_val}/1000. Simplified (divide by ${g_h2}) is ${h2_val / g_h2}/${1000 / g_h2}.`
+      });
+
+      const integerPart = Math.floor(Math.random() * 8) + 1;
+      let decVal;
+      while (true) {
+        let candidate = Math.floor(Math.random() * 899) + 100;
+        if (candidate % 2 === 0 || candidate % 5 === 0) {
+          decVal = candidate;
+          break;
+        }
+      }
+      const decStr = (decVal / 1000).toString().substring(2);
+      const g_h3 = gcd(decVal, 1000);
+      list.push({
+        type: 'dec2frac',
+        decStr: `${integerPart}.${decStr}`,
+        targetInt: integerPart,
+        targetNum: decVal / g_h3,
+        targetDen: 1000 / g_h3,
+        rawNum: decVal,
+        rawDen: 1000,
+        level: 'hard',
+        levelRank: 3,
+        hintZh: `${integerPart}.${decStr} 可寫成帶分數 ${integerPart} 又 ${decVal}/1000。約簡後為 ${integerPart} 又 ${decVal / g_h3}/${1000 / g_h3}。`,
+        hintEn: `${integerPart}.${decStr} = ${integerPart} and ${decVal}/1000. Simplified is ${integerPart} and ${decVal / g_h3}/${1000 / g_h3}.`
+      });
+
+      list.sort((a, b) => a.levelRank - b.levelRank);
+      return list;
+    }
+
+    function generateUnit2() {
+      let list = [];
+
+      // --- 初階題目（6 題）：擴分法 ---
+      const easyDenoms = [20, 25, 50, 125, 200, 250, 500];
+      for (let i = 0; i < 6; i++) {
+        let den = easyDenoms[i % easyDenoms.length];
+        let num;
+        while (true) {
+          num = Math.floor(Math.random() * (den - 1)) + 1;
+          if (gcd(num, den) === 1) {
+            let val = num / den;
+            if (![0.25, 0.5, 0.75, 0.2, 0.4, 0.6, 0.8, 0.125, 0.375, 0.625, 0.875].includes(val)) {
+              break;
+            }
+          }
+        }
+        let ansDec = (num / den).toString();
+        let targetBase = (1000 % den === 0 && den > 100) ? 1000 : (100 % den === 0 ? 100 : 1000);
+        let mult = targetBase / den;
+
+        list.push({
+          type: 'frac2dec',
+          fracDisplay: { int: 0, num: num, den: den },
+          targetDec: ansDec,
+          level: 'easy',
+          levelRank: 1,
+          hintZh: `看看怎樣把 ${num}/${den} 化為小數：<br>` +
+                  `把分數擴分至分母是 ${targetBase} 的分數，可以方便我們把分數化為小數。<br>` +
+                  `${num}/${den} = (${num} × ${mult}) / (${den} × ${mult}) = ${num * mult}/${targetBase} = <strong>${ansDec}</strong>`,
+          hintEn: `How to convert ${num}/${den} to a decimal:<br>` +
+                  `Expand the fraction so its denominator is ${targetBase}:<br>` +
+                  `${num}/${den} = (${num} × ${mult}) / (${den} × ${mult}) = ${num * mult}/${targetBase} = <strong>${ansDec}</strong>`
+        });
+      }
+
+      // --- 中階題目（4 題）：估計分數化為小數時的數值範圍 ---
+      const estCandidates = [
+        { int: 0, num: 9, den: 14 },
+        { int: 0, num: 3, den: 14 },
+        { int: 3, num: 3, den: 8 },
+        { int: 6, num: 11, den: 16 },
+        { int: 2, num: 5, den: 12 },
+        { int: 4, num: 7, den: 9 }
+      ];
+
+      estCandidates.sort(() => Math.random() - 0.5);
+      for (let i = 0; i < 4; i++) {
+        let item = estCandidates[i];
+        let fracVal = item.num / item.den;
+        let isGreaterHalf = fracVal > 0.5;
+
+        let lower, upper;
+        if (item.int === 0) {
+          if (isGreaterHalf) { lower = "0.5"; upper = "1"; }
+          else { lower = "0"; upper = "0.5"; }
+        } else {
+          if (isGreaterHalf) {
+            lower = `${item.int}.5`;
+            upper = `${item.int + 1}`;
+          } else {
+            lower = `${item.int}`;
+            upper = `${item.int}.5`;
+          }
+        }
+
+        let correctOpt = `${lower} 和 ${upper}`;
+        let correctOptEn = `Between ${lower} and ${upper}`;
+
+        let baseInt = item.int;
+        let optListZh = [];
+        let optListEn = [];
+
+        if (baseInt === 0) {
+          optListZh = ["0 和 0.5", "0.5 和 1", "1 和 1.5"];
+          optListEn = ["Between 0 and 0.5", "Between 0.5 and 1", "Between 1 and 1.5"];
+        } else {
+          optListZh = [`${baseInt} 和 ${baseInt}.5`, `${baseInt}.5 和 ${baseInt + 1}`, `${baseInt + 1} 和 ${baseInt + 1}.5`];
+          optListEn = [`Between ${baseInt} and ${baseInt}.5`, `Between ${baseInt}.5 and ${baseInt + 1}`, `Between ${baseInt + 1} and ${baseInt + 1}.5`];
+        }
+
+        let fracStr = item.int > 0 ? `${item.int} 又 ${item.num}/${item.den}` : `${item.num}/${item.den}`;
+        let fracStrEn = item.int > 0 ? `${item.int} and ${item.num}/${item.den}` : `${item.num}/${item.den}`;
+
+        let compareSymbol = isGreaterHalf ? ">" : "<";
+        let compareText = isGreaterHalf ? "大於" : "小於";
+        let compareTextEn = isGreaterHalf ? "greater than" : "less than";
+
+        let hintZh = item.int > 0
+          ? `考慮 ${fracStr} 的分數部分：<br>` +
+            `${item.num}/${item.den} ${compareSymbol} 1/2，即 ${item.num}/${item.den} ${compareSymbol} 0.5（${compareText} 0.5）。<br>` +
+            `∴ <strong>${fracStr} 的數值在 ${lower} 和 ${upper} 之間。</strong>`
+          : `考慮分數 ${fracStr}：<br>` +
+            `${item.num}/${item.den} ${compareSymbol} 1/2，即 ${item.num}/${item.den} ${compareSymbol} 0.5（${compareText} 0.5）。<br>` +
+            `∴ <strong>${fracStr} 的數值在 ${lower} 和 ${upper} 之間。</strong>`;
+
+        let hintEn = item.int > 0
+          ? `Consider the fraction part of ${fracStrEn}:<br>` +
+            `${item.num}/${item.den} ${compareSymbol} 1/2, so ${item.num}/${item.den} is ${compareTextEn} 0.5.<br>` +
+            `∴ <strong>The value of ${fracStrEn} is between ${lower} and ${upper}.</strong>`
+          : `Consider the fraction ${fracStrEn}:<br>` +
+            `${item.num}/${item.den} ${compareSymbol} 1/2, so ${item.num}/${item.den} is ${compareTextEn} 0.5.<br>` +
+            `∴ <strong>The value of ${fracStrEn} is between ${lower} and ${upper}.</strong>`;
+
+        list.push({
+          type: 'estimate_range',
+          fracDisplay: { int: item.int, num: item.num, den: item.den },
+          optionsZh: optListZh,
+          optionsEn: optListEn,
+          targetOptIndex: optListZh.indexOf(correctOpt),
+          targetAnsZh: correctOpt,
+          targetAnsEn: correctOptEn,
+          level: 'med',
+          levelRank: 2,
+          hintZh: hintZh,
+          hintEn: hintEn
+        });
+      }
+
+      list.sort((a, b) => a.levelRank - b.levelRank);
+      return list;
+    }
+
+    function generateUnit3() {
+      let poolsDec2Frac = [
+        { dec: '0.25', int: 0, num: 1, den: 4 },
+        { dec: '0.5', int: 0, num: 1, den: 2 },
+        { dec: '0.75', int: 0, num: 3, den: 4 },
+        { dec: '0.2', int: 0, num: 1, den: 5 },
+        { dec: '0.4', int: 0, num: 2, den: 5 },
+        { dec: '0.6', int: 0, num: 3, den: 5 },
+        { dec: '0.8', int: 0, num: 4, den: 5 },
+        { dec: '0.125', int: 0, num: 1, den: 8 },
+        { dec: '0.375', int: 0, num: 3, den: 8 },
+        { dec: '0.625', int: 0, num: 5, den: 8 },
+        { dec: '0.875', int: 0, num: 7, den: 8 }
+      ];
+
+      let poolsFrac2Dec = [
+        { dec: '0.25', int: 0, num: 1, den: 4 },
+        { dec: '0.5', int: 0, num: 1, den: 2 },
+        { dec: '0.75', int: 0, num: 3, den: 4 },
+        { dec: '0.2', int: 0, num: 1, den: 5 },
+        { dec: '0.4', int: 0, num: 2, den: 5 },
+        { dec: '0.6', int: 0, num: 3, den: 5 },
+        { dec: '0.8', int: 0, num: 4, den: 5 },
+        { dec: '0.125', int: 0, num: 1, den: 8 },
+        { dec: '0.375', int: 0, num: 3, den: 8 },
+        { dec: '0.625', int: 0, num: 5, den: 8 },
+        { dec: '0.875', int: 0, num: 7, den: 8 }
+      ];
+
+      let mandatoryDec2Frac = {
+        type: 'dec2frac',
+        decStr: '0.3',
+        targetInt: 0,
+        targetNum: 3,
+        targetDen: 10,
+        rawNum: 3,
+        rawDen: 10,
+        hintZh: '0.3 是一常見小數，寫成分數即為 3/10。',
+        hintEn: '0.3 is a common decimal, which converts directly to 3/10.'
+      };
+
+      let mandatoryFrac2Dec = {
+        type: 'frac2dec_round',
+        fracDisplay: { int: 0, num: 1, den: 3 },
+        targetDec: '0.33',
+        hintZh: '1 ÷ 3 = 0.3333... 取值至小數點後兩位（四捨五入）約為 0.33。',
+        hintEn: '1 ÷ 3 = 0.3333... Rounded to 2 decimal places is 0.33.'
+      };
+
+      let list = [mandatoryDec2Frac, mandatoryFrac2Dec];
+
+      poolsDec2Frac.sort(() => Math.random() - 0.5);
+      for (let i = 0; i < 4; i++) {
+        let item = poolsDec2Frac[i];
+        list.push({
+          type: 'dec2frac',
+          decStr: item.dec,
+          targetInt: item.int,
+          targetNum: item.num,
+          targetDen: item.den,
+          rawNum: item.num,
+          rawDen: item.den,
+          hintZh: `${item.dec} 是常用小數，對應的最簡分數為 ${item.num}/${item.den}。`,
+          hintEn: `${item.dec} corresponds to simplified fraction ${item.num}/${item.den}.`
+        });
+      }
+
+      poolsFrac2Dec.sort(() => Math.random() - 0.5);
+      for (let i = 0; i < 4; i++) {
+        let item = poolsFrac2Dec[i];
+        list.push({
+          type: 'frac2dec',
+          fracDisplay: { int: item.int, num: item.num, den: item.den },
+          targetDec: item.dec,
+          hintZh: `${item.num}/${item.den} 是常用分數，對應的小數為 ${item.dec}。`,
+          hintEn: `${item.num}/${item.den} corresponds to decimal ${item.dec}.`
+        });
+      }
+
+      list.sort(() => Math.random() - 0.5);
+      return list;
+    }
+
+    function generateQuestions(mode) {
+      if (mode === 'dec_to_frac') return generateUnit1();
+      if (mode === 'frac_to_dec') return generateUnit2();
+      if (mode === 'common_combos') return generateUnit3();
+      return [];
+    }
+
+    /* ----------------------------------------------------
+       測驗流程與介面控制
+    ---------------------------------------------------- */
+    function startQuiz(mode) {
+      currentMode = mode;
+      questions = generateQuestions(mode);
+      currentQIndex = 0;
+      records = [];
+      startTimeObj = new Date();
+
+      document.getElementById('page-home').classList.add('hidden');
+      document.getElementById('page-report').classList.add('hidden');
+      document.getElementById('page-quiz').classList.remove('hidden');
+      document.getElementById('lang-toggle-btn').classList.add('hidden');
+
+      loadQuestion();
+    }
+
+    function selectOption(index) {
+      selectedOptionIndex = index;
+      const buttons = document.querySelectorAll('.option-btn');
+      buttons.forEach((btn, idx) => {
+        if (idx === index) btn.classList.add('selected');
+        else btn.classList.remove('selected');
+      });
+    }
+
+    function loadQuestion() {
+      wrongAttempts = 0;
+      selectedOptionIndex = null;
+      const t = i18n[currentLang];
+      const q = questions[currentQIndex];
+
+      let modeName = t.unit1;
+      if (currentMode === 'frac_to_dec') modeName = t.unit2;
+      else if (currentMode === 'common_combos') modeName = t.unit3;
+
+      document.getElementById('quiz-mode-name').innerText = modeName;
+      document.getElementById('quiz-progress-text').innerText = `${t.qProgress} ${currentQIndex + 1} / ${questions.length}`;
+
+      const qDisplay = document.getElementById('question-display');
+      const inputContainer = document.getElementById('answer-input-container');
+      const equalSign = document.getElementById('equal-sign');
+
+      if (q.type === 'estimate_range') {
+        equalSign.style.display = 'none';
+        const f = q.fracDisplay;
+        let fracHtml = f.int > 0 
+          ? `<div class="mixed-display"><span>${f.int}</span><div class="frac-display"><span class="num">${f.num}</span><span class="den">${f.den}</span></div></div>`
+          : `<div class="frac-display"><span class="num">${f.num}</span><span class="den">${f.den}</span></div>`;
+
+        qDisplay.innerHTML = `<div style="width:100%; text-align:center; font-size:1.4rem;">${fracHtml} ${t.estimateQuestionText}</div>`;
+
+        const opts = currentLang === 'zh' ? q.optionsZh : q.optionsEn;
+        let optsHtml = `<div class="options-group">`;
+        opts.forEach((optText, idx) => {
+          optsHtml += `<button class="option-btn" onclick="selectOption(${idx})">${optText}</button>`;
+        });
+        optsHtml += `</div>`;
+        inputContainer.innerHTML = optsHtml;
+
+      } else {
+        equalSign.style.display = 'inline';
+
+        if (q.type === 'dec2frac') {
+          qDisplay.innerHTML = q.decStr;
+          if (q.targetInt > 0) {
+            inputContainer.innerHTML = `
+              <div class="mixed-input-box">
+                <input type="text" id="ans-int" class="answer-input input-int" autocomplete="off" inputmode="numeric" onkeypress="handleKeyPress(event)" placeholder="${currentLang === 'zh' ? '整數' : 'Int'}">
+                <div class="frac-input-group">
+                  <input type="text" id="ans-num" class="answer-input input-num" autocomplete="off" inputmode="numeric" onkeypress="handleKeyPress(event)" placeholder="${currentLang === 'zh' ? '分子' : 'Num'}">
+                  <div class="frac-line-hr"></div>
+                  <input type="text" id="ans-den" class="answer-input input-den" autocomplete="off" inputmode="numeric" onkeypress="handleKeyPress(event)" placeholder="${currentLang === 'zh' ? '分母' : 'Den'}">
+                </div>
+              </div>
+            `;
+          } else {
+            inputContainer.innerHTML = `
+              <div class="frac-input-group">
+                <input type="text" id="ans-num" class="answer-input input-num" autocomplete="off" inputmode="numeric" onkeypress="handleKeyPress(event)" placeholder="${currentLang === 'zh' ? '分子' : 'Num'}">
+                <div class="frac-line-hr"></div>
+                <input type="text" id="ans-den" class="answer-input input-den" autocomplete="off" inputmode="numeric" onkeypress="handleKeyPress(event)" placeholder="${currentLang === 'zh' ? '分母' : 'Den'}">
+              </div>
+            `;
+          }
+        } else {
+          const f = q.fracDisplay;
+          let fracHtml = f.int > 0 
+            ? `<div class="mixed-display"><span>${f.int}</span><div class="frac-display"><span class="num">${f.num}</span><span class="den">${f.den}</span></div></div>`
+            : `<div class="frac-display"><span class="num">${f.num}</span><span class="den">${f.den}</span></div>`;
+          
+          if (q.type === 'frac2dec_round') {
+            fracHtml += `<span style="font-size:1rem; color:#718096; margin-left:4px;">${t.roundHintText}</span>`;
+          }
+
+          qDisplay.innerHTML = fracHtml;
+          inputContainer.innerHTML = `
+            <input type="text" id="ans-dec" class="answer-input input-single" placeholder="${currentLang === 'zh' ? '答案' : 'Ans'}" autocomplete="off" inputmode="decimal" onkeypress="handleKeyPress(event)">
+          `;
+        }
+
+        setTimeout(() => {
+          const firstInput = inputContainer.querySelector('input');
+          if (firstInput) firstInput.focus();
+        }, 100);
+      }
+
+      document.getElementById('feedback-area').classList.add('hidden');
+      document.getElementById('feedback-area').innerHTML = '';
+      
+      document.getElementById('btn-submit').classList.remove('hidden');
+      document.getElementById('btn-next').classList.add('hidden');
+      document.getElementById('btn-next').innerText = t.nextBtn;
+      document.getElementById('btn-submit').innerText = t.submitBtn;
+    }
+
+    function checkAnswer() {
+      const q = questions[currentQIndex];
+      const t = i18n[currentLang];
+      const feedback = document.getElementById('feedback-area');
+
+      let isCorrect = false;
+      let isUnsimplified = false;
+      let isTrailingZeroError = false;
+      let userAnsDisplay = '';
+      let targetAnsDisplay = '';
+
+      if (q.type === 'estimate_range') {
+        if (selectedOptionIndex === null) return;
+
+        const opts = currentLang === 'zh' ? q.optionsZh : q.optionsEn;
+        userAnsDisplay = opts[selectedOptionIndex];
+        targetAnsDisplay = currentLang === 'zh' ? q.targetAnsZh : q.targetAnsEn;
+
+        if (selectedOptionIndex === q.targetOptIndex) {
+          isCorrect = true;
+        }
+
+      } else if (q.type === 'dec2frac') {
+        const numInput = document.getElementById('ans-num');
+        const denInput = document.getElementById('ans-den');
+        const intInput = document.getElementById('ans-int');
+
+        const uNum = numInput ? parseInt(numInput.value.trim(), 10) : NaN;
+        const uDen = denInput ? parseInt(denInput.value.trim(), 10) : NaN;
+        const uInt = intInput ? parseInt(intInput.value.trim(), 10) : 0;
+
+        if (isNaN(uNum) || isNaN(uDen) || (intInput && isNaN(uInt))) return;
+
+        userAnsDisplay = q.targetInt > 0 
+          ? (currentLang === 'zh' ? `${uInt} 又 ${uNum}/${uDen}` : `${uInt} and ${uNum}/${uDen}`)
+          : `${uNum}/${uDen}`;
+        
+        targetAnsDisplay = q.targetInt > 0 
+          ? (currentLang === 'zh' ? `${q.targetInt} 又 ${q.targetNum}/${q.targetDen}` : `${q.targetInt} and ${q.targetNum}/${q.targetDen}`)
+          : `${q.targetNum}/${q.targetDen}`;
+
+        if (uInt === q.targetInt && uNum === q.targetNum && uDen === q.targetDen) {
+          isCorrect = true;
+        } else if (uInt === q.targetInt && q.rawNum && q.rawDen && uNum === q.rawNum && uDen === q.rawDen) {
+          isUnsimplified = true;
+        } else {
+          if (uDen !== 0 && (uNum / uDen) === (q.targetNum / q.targetDen) && uInt === q.targetInt) {
+            isUnsimplified = true;
+          }
+        }
+      } else {
+        const decInput = document.getElementById('ans-dec');
+        const uDecStr = decInput ? decInput.value.trim() : '';
+
+        if (uDecStr === '') return;
+
+        userAnsDisplay = uDecStr;
+        targetAnsDisplay = q.targetDec;
+
+        if (uDecStr.includes('.') && uDecStr.endsWith('0')) {
+          isTrailingZeroError = true;
+        }
+
+        const uVal = parseFloat(uDecStr);
+        const tVal = parseFloat(q.targetDec);
+
+        if (!isTrailingZeroError && !isNaN(uVal) && Math.abs(uVal - tVal) < 0.0001) {
+          isCorrect = true;
+        }
+      }
+
+      if (!records[currentQIndex]) {
+        records[currentQIndex] = {
+          qIndex: currentQIndex + 1,
+          questionObj: q,
+          targetAns: targetAnsDisplay,
+          userFirstWrong: null,
+          isCorrectOnFirstTry: false,
+          solved: false
+        };
+      }
+
+      if (isCorrect) {
+        if (wrongAttempts === 0) {
+          records[currentQIndex].isCorrectOnFirstTry = true;
+        }
+        records[currentQIndex].solved = true;
+
+        const randomPraise = t.praise[Math.floor(Math.random() * t.praise.length)];
+        feedback.className = "feedback-box feedback-success";
+        feedback.innerHTML = `<strong>${randomPraise}</strong>`;
+        feedback.classList.remove('hidden');
+
+        document.querySelectorAll('#answer-input-container input, .option-btn').forEach(el => el.disabled = true);
+        document.getElementById('btn-submit').classList.add('hidden');
+        document.getElementById('btn-next').classList.remove('hidden');
+        document.getElementById('btn-next').focus();
+
+      } else {
+        wrongAttempts++;
+        if (records[currentQIndex].userFirstWrong === null) {
+          records[currentQIndex].userFirstWrong = userAnsDisplay;
+        }
+
+        if (wrongAttempts < 3) {
+          feedback.className = "feedback-box feedback-warning";
+
+          let hintBody = "";
+          if (q.type === 'dec2frac') {
+            if (isUnsimplified) {
+              hintBody = `<div style="margin-top:6px;">${t.simplifyHint}</div>`;
+            } else {
+              hintBody = `<div style="margin-top:6px;">${t.conceptHintDec2Frac}</div>`;
+            }
+          } else if (q.type === 'estimate_range') {
+            hintBody = `<div style="margin-top:6px;">${t.conceptHintEstimate}</div>`;
+          } else {
+            // 分數化小數 (frac2dec / frac2dec_round)
+            if (isTrailingZeroError) {
+              hintBody = `<div style="margin-top:6px; font-weight:bold; color:#e53e3e;">${t.warnTrailingZero}</div>`;
+            } else {
+              hintBody = `<div style="margin-top:6px;">${t.conceptHintFrac2Dec}</div>`;
+            }
+          }
+
+          feedback.innerHTML = `
+            <div><strong>${t.encourageTitle}</strong></div>
+            ${hintBody}
+          `;
+          feedback.classList.remove('hidden');
+        } else {
+          feedback.className = "feedback-box feedback-danger";
+          const currentHint = currentLang === 'zh' ? q.hintZh : q.hintEn;
+          feedback.innerHTML = `
+            <div class="solution-steps">
+              <strong>${t.stepTitle}</strong><br>
+              ${currentHint}<br>
+              ${t.correctAnsLabel}：<strong style="color:#e53e3e; font-size:1.1rem;">${targetAnsDisplay}</strong>
+            </div>
+          `;
+          feedback.classList.remove('hidden');
+
+          document.querySelectorAll('#answer-input-container input, .option-btn').forEach(el => el.disabled = true);
+          document.getElementById('btn-submit').classList.add('hidden');
+          document.getElementById('btn-next').classList.remove('hidden');
+          document.getElementById('btn-next').focus();
+        }
+      }
+    }
+
+    function nextQuestion() {
+      currentQIndex++;
+      if (currentQIndex < questions.length) {
+        loadQuestion();
+      } else {
+        showReport();
+      }
+    }
+
+    function formatDate(d) {
+      const pad = (n) => n.toString().padStart(2, '0');
+      return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    }
+
+    function formatDuration(start, end) {
+      const diff = Math.max(0, Math.floor((end - start) / 1000));
+      const mins = Math.floor(diff / 60);
+      const secs = diff % 60;
+      if (currentLang === 'en') {
+        return mins > 0 ? `${mins} min ${secs} sec` : `${secs} sec`;
+      }
+      return mins > 0 ? `${mins}分鐘${String(secs).padStart(2, '0')}秒` : `${secs}秒`;
+    }
+
+    function getQuestionTitleText(q) {
+      if (q.type === 'dec2frac') {
+        return q.decStr;
+      } else if (q.type === 'estimate_range') {
+        const f = q.fracDisplay;
+        return f.int > 0 
+          ? (currentLang === 'zh' ? `${f.int}又${f.num}/${f.den} (估值)` : `${f.int} and ${f.num}/${f.den} (Est.)`)
+          : `${f.num}/${f.den} (估值)`;
+      } else {
+        const f = q.fracDisplay;
+        return f.int > 0 
+          ? (currentLang === 'zh' ? `${f.int}又${f.num}/${f.den}` : `${f.int} and ${f.num}/${f.den}`)
+          : `${f.num}/${f.den}`;
+      }
+    }
+
+    function showReport() {
+      const endTimeObj = new Date();
+      const t = i18n[currentLang];
+
+      document.getElementById('page-quiz').classList.add('hidden');
+      document.getElementById('page-report').classList.remove('hidden');
+
+      document.getElementById('report-main-title').innerText = t.reportTitle;
+      document.getElementById('lbl-start-time').innerText = t.startTime;
+      document.getElementById('lbl-end-time').innerText = t.endTime;
+      document.getElementById('lbl-duration').innerText = t.durationTime;
+      document.getElementById('lbl-total-correct').innerText = t.totalCorrect;
+      document.getElementById('lbl-accuracy').innerText = t.accuracy;
+      document.getElementById('lbl-mastery-title').innerText = t.masteryTitle;
+      document.getElementById('lbl-correct-title').innerText = t.correctTitle;
+      document.getElementById('lbl-wrong-title').innerText = t.wrongTitle;
+
+      document.getElementById('lbl-btn-download').innerText = t.btnDownload;
+      document.getElementById('lbl-btn-retry').innerText = t.btnRetry;
+      document.getElementById('lbl-btn-home').innerText = t.btnHome;
+
+      document.getElementById('val-start-time').innerText = formatDate(startTimeObj);
+      document.getElementById('val-end-time').innerText = formatDate(endTimeObj);
+      document.getElementById('val-duration').innerText = formatDuration(startTimeObj, endTimeObj);
+
+      let correctCount = 0;
+      records.forEach(r => {
+        if (r.isCorrectOnFirstTry) correctCount++;
+      });
+
+      const total = records.length;
+      const accuracyPct = Math.round((correctCount / total) * 100);
+
+      document.getElementById('val-correct-count').innerText = `${correctCount} / ${total}`;
+      document.getElementById('val-accuracy').innerText = `${accuracyPct}%`;
+
+      let modeName = t.unit1;
+      if (currentMode === 'frac_to_dec') modeName = t.unit2;
+      else if (currentMode === 'common_combos') modeName = t.unit3;
+
+      document.getElementById('report-unit-name').innerText = modeName;
+      document.getElementById('val-unit-mastery').innerText = `${correctCount} / ${total} (${accuracyPct}%)`;
+
+      const correctContainer = document.getElementById('correct-list-container');
+      correctContainer.innerHTML = '';
+      const correctItems = records.filter(r => r.isCorrectOnFirstTry);
+
+      if (correctItems.length === 0) {
+        correctContainer.innerHTML = `<div style="font-size:0.95rem; color:#718096; padding-left:5px;">${t.noCorrect}</div>`;
+      } else {
+        correctItems.forEach(item => {
+          const qText = t.questionLabel.replace('{n}', item.qIndex);
+          const qExprText = getQuestionTitleText(item.questionObj);
+          const itemDiv = document.createElement('div');
+          itemDiv.className = 'item-card-correct';
+          itemDiv.innerHTML = `
+            <div class="item-q-title">${qText} : ${qExprText}</div>
+            <div class="item-ans-text">${t.ansLabel} : ${item.targetAns}</div>
+          `;
+          correctContainer.appendChild(itemDiv);
+        });
+      }
+
+      const wrongContainer = document.getElementById('wrong-list-container');
+      wrongContainer.innerHTML = '';
+      const wrongItems = records.filter(r => !r.isCorrectOnFirstTry);
+
+      if (wrongItems.length === 0) {
+        wrongContainer.innerHTML = `<div style="font-size:0.95rem; color:#38a169; padding-left:5px;">${t.noWrong}</div>`;
+      } else {
+        wrongItems.forEach(item => {
+          const qText = t.questionLabel.replace('{n}', item.qIndex);
+          const qExprText = getQuestionTitleText(item.questionObj);
+          const userAnsDisplay = item.userFirstWrong !== null ? item.userFirstWrong : '-';
+          const itemDiv = document.createElement('div');
+          itemDiv.className = 'item-card-wrong';
+          itemDiv.innerHTML = `
+            <div class="item-q-title">${qText} : ${qExprText}</div>
+            <div class="item-ans-text">${t.yourAnsLabel} : ${userAnsDisplay} | ${t.correctAnsLabel} : ${item.targetAns}</div>
+          `;
+          wrongContainer.appendChild(itemDiv);
+        });
+      }
+    }
+
+    function downloadReportImage() {
+      const element = document.getElementById('report-card-to-capture');
+      if (!element) return;
+
+      html2canvas(element, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        useCORS: true
+      }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `Math_Report_${new Date().toISOString().slice(0,10)}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      }).catch(err => {
+        alert("下載失敗：" + err);
+      });
+    }
+
+    function openModal(title, msg, cancelTxt, confirmTxt, onConfirm) {
+      document.getElementById('modal-title').innerText = title;
+      document.getElementById('modal-msg').innerText = msg;
+      document.getElementById('modal-cancel-btn').innerText = cancelTxt;
+      document.getElementById('modal-confirm-btn').innerText = confirmTxt;
+      modalActionCallback = onConfirm;
+      document.getElementById('custom-modal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('custom-modal').classList.remove('active');
+    }
+
+    function confirmModalAction() {
+      closeModal();
+      if (modalActionCallback) modalActionCallback();
+    }
+
+    function askReturnHome() {
+      const t = i18n[currentLang];
+      openModal(
+        t.modalReturnTitle,
+        t.modalReturnMsg,
+        t.modalCancel,
+        t.modalConfirm,
+        goHome
+      );
+    }
+
+    function retryPractice() {
+      startQuiz(currentMode || 'dec_to_frac');
+    }
+
+    function goHome() {
+      document.getElementById('page-quiz').classList.add('hidden');
+      document.getElementById('page-report').classList.add('hidden');
+      document.getElementById('page-home').classList.remove('hidden');
+      document.getElementById('lang-toggle-btn').classList.remove('hidden');
+    }
+  </script>
+
+  <!-- iPad 修正腳本 -->
+  <script src="https://mathteacher1618.github.io/my_fixes/ipad_fix.js"></script>
+</body>
+</html>
